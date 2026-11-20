@@ -29,7 +29,7 @@ export default async function handler(req, res) {
   if (!messages.length || messages[messages.length - 1].role !== "user") return res.status(400).json({ error: "Bad request" });
 
   try {
-    const model = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+    const model = process.env.GEMINI_MODEL ||  "gemini-3.8-flash";
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": key },
