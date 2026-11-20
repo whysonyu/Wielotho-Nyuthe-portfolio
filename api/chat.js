@@ -30,13 +30,14 @@ export default async function handler(req, res) {
 
   try {
     const model = process.env.GEMINI_MODEL ||  "gemini-3.8-flash";
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      signal: AbortSignal.timeout(20000),
       method: "POST",
       headers: { "content-type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: SYSTEM }] },
         contents: messages.map(m => ({ role: m.role === "assistant" ? "model" : "user", parts: [{ text: m.content }] })),
-        generationConfig: { maxOutputTokens: 800 }
+         generationConfig: { maxOutputTokens: 800, thinkingConfig: { thinkingLevel: "low" } }
       })
     });
     if (!r.ok) { const t = await r.text(); return res.status(502).json({ error: "AI service error " + r.status + ": " + t.slice(0, 300) }); }
