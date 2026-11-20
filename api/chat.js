@@ -13,8 +13,14 @@ Facts about Wielotho (only use these; never invent anything else):
 If asked something not covered above (grades, other projects, personal details, availability, etc.), say you don't have that information and suggest emailing Wielotho. Do not make up facts. Stay on topic: politely decline unrelated requests (coding help, general chat, etc.) and steer back to Wielotho's background.`;
 
 export default async function handler(req, res) {
+   const key = process.env.GEMINI_API_KEY;
+  if (req.method === "GET") {
+    // Temporary: lists the models your key can use
+    const lr = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=100", { headers: { "x-goog-api-key": key || "" } });
+    const ld = await lr.json();
+    return res.status(200).json((ld.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent")).map(m => m.name));
+  }
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
-  const key = process.env.GEMINI_API_KEY;
   if (!key) return res.status(500).json({ error: "Chatbot is not configured." });
 
   let messages = req.body && req.body.messages;
@@ -29,7 +35,7 @@ export default async function handler(req, res) {
   if (!messages.length || messages[messages.length - 1].role !== "user") return res.status(400).json({ error: "Bad request" });
 
   try {
-    const model = process.env.GEMINI_MODEL ||  "gemini-3.8-flash";
+    const model = process.env.GEMINI_MODEL || "gemini-flash-lite-latest";
         const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       signal: AbortSignal.timeout(20000),
       method: "POST",
