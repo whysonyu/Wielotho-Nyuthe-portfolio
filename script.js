@@ -18,7 +18,7 @@ async function ask(text){
     const {reply}=await r.json();
     wait.textContent=reply;history.push({role:"assistant",content:reply});
   }catch(err){
-    wait.textContent="Sorry, I couldn't answer right now. You can email Wielotho at "+EMAIL+".\n\n[debug: "+err.message+"]";
+    wait.textContent="Sorry, I couldn't answer right now. You can email Wielotho at "+EMAIL+".";
     history.pop();
   }
   busy=false;sendBtn.disabled=false;body.scrollTop=body.scrollHeight;
