@@ -14,12 +14,7 @@ If asked something not covered above (grades, other projects, personal details, 
 
 export default async function handler(req, res) {
    const key = process.env.GEMINI_API_KEY;
-  if (req.method === "GET") {
-    // Temporary: lists the models your key can use
-    const lr = await fetch("https://generativelanguage.googleapis.com/v1beta/models?pageSize=100", { headers: { "x-goog-api-key": key || "" } });
-    const ld = await lr.json();
-    return res.status(200).json((ld.models || []).filter(m => (m.supportedGenerationMethods || []).includes("generateContent")).map(m => m.name));
-  }
+ 
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
   if (!key) return res.status(500).json({ error: "Chatbot is not configured." });
 
