@@ -39,12 +39,12 @@ export default async function handler(req, res) {
         generationConfig: { maxOutputTokens: 400, thinkingConfig: { thinkingBudget: 0 } }
       })
     });
-    if (!r.ok) return res.status(502).json({ error: "AI service error" });
+    if (!r.ok) { const t = await r.text(); return res.status(502).json({ error: "AI service error " + r.status + ": " + t.slice(0, 300) }); }
     const data = await r.json();
     const parts = (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) || [];
     const reply = parts.map(p => p.text || "").join("").trim();
     return res.status(200).json({ reply: reply || "Sorry, I couldn't come up with an answer." });
-  } catch {
-    return res.status(500).json({ error: "Server error" });
+  } catch (e) {
+    return res.status(500).json({ error: "Server error: " + String(e).slice(0, 200) });
   }
 }
