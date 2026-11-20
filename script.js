@@ -13,7 +13,7 @@ async function ask(text){
   say(text,true);history.push({role:"user",content:text});
   const wait=say("Thinking…");
   try{
-    const r=await fetch("/api/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});
+    const r=await fetch("/api/chat",{signal:AbortSignal.timeout(30000),method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({messages:history})});
     if(!r.ok){let m="";try{m=(await r.json()).error}catch{}throw new Error(m||("HTTP "+r.status));}
     const {reply}=await r.json();
     wait.textContent=reply;history.push({role:"assistant",content:reply});
